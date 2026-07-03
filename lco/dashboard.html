@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>LCO Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="bg-gray-50 font-sans min-h-screen pb-20">
+  <div class="max-w-lg mx-auto">
+    <header class="bg-white px-5 py-4 flex items-center justify-between border-b border-gray-100 sticky top-0 z-10">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 font-bold text-sm" id="avatar">RS</div>
+        <div>
+          <h1 class="text-lg font-bold text-gray-800" id="greeting">Hello, Ramesh</h1>
+          <p class="text-xs text-gray-500" id="operatorInfo">LCO001 · Sector 7</p>
+        </div>
+      </div>
+      <button onclick="window.location.href='../index.html'" class="text-gray-400">
+        <i class="fas fa-sign-out-alt text-lg"></i>
+      </button>
+    </header>
+
+    <div class="px-4 py-4">
+      <div class="bg-blue-600 rounded-2xl p-5 text-white mb-4 shadow-lg shadow-blue-200">
+        <p class="text-xs text-blue-200 font-medium mb-1">Your Network</p>
+        <div class="grid grid-cols-3 gap-4 mt-3">
+          <div class="text-center">
+            <p class="text-2xl font-bold" id="totalBoxes">52</p>
+            <p class="text-xs text-blue-200">Total Boxes</p>
+          </div>
+          <div class="text-center">
+            <p class="text-2xl font-bold" id="activeBoxes">48</p>
+            <p class="text-xs text-blue-200">Active</p>
+          </div>
+          <div class="text-center">
+            <p class="text-2xl font-bold" id="inactiveBoxes">4</p>
+            <p class="text-xs text-blue-200">Inactive</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 mb-4">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-sm font-bold text-gray-800">Activation Status</h2>
+          <span id="activationBadge" class="px-3 py-1 rounded-full text-xs font-medium">-</span>
+        </div>
+        <p class="text-sm text-gray-600" id="activationMsg">-</p>
+        <div class="mt-3 bg-gray-50 rounded-xl h-2 overflow-hidden">
+          <div id="progressBar" class="h-full bg-blue-500 rounded-xl transition-all" style="width: 0%"></div>
+        </div>
+        <p class="text-xs text-gray-400 mt-1" id="cycleInfo">-</p>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <button onclick="window.location.href='boxes.html'" class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-left">
+          <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center mb-2">
+            <i class="fas fa-box text-green-600"></i>
+          </div>
+          <p class="text-sm font-semibold text-gray-800">My Boxes</p>
+          <p class="text-xs text-gray-500 mt-0.5">Manage activation</p>
+        </button>
+        <button onclick="window.location.href='payments.html'" class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-left">
+          <div class="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center mb-2">
+            <i class="fas fa-credit-card text-orange-600"></i>
+          </div>
+          <p class="text-sm font-semibold text-gray-800">Payments</p>
+          <p class="text-xs text-gray-500 mt-0.5">Mark paid/unpaid</p>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-10 max-w-lg mx-auto">
+    <div class="flex justify-around py-2">
+      <a href="dashboard.html" class="flex flex-col items-center px-4 py-1 text-blue-600">
+        <i class="fas fa-home text-lg"></i>
+        <span class="text-xs font-medium mt-0.5">Home</span>
+      </a>
+      <a href="boxes.html" class="flex flex-col items-center px-4 py-1 text-gray-400">
+        <i class="fas fa-box text-lg"></i>
+        <span class="text-xs mt-0.5">Boxes</span>
+      </a>
+      <a href="payments.html" class="flex flex-col items-center px-4 py-1 text-gray-400">
+        <i class="fas fa-credit-card text-lg"></i>
+        <span class="text-xs mt-0.5">Payments</span>
+      </a>
+      <a href="my-payment.html" class="flex flex-col items-center px-4 py-1 text-gray-400">
+        <i class="fas fa-wallet text-lg"></i>
+        <span class="text-xs mt-0.5">My Dues</span>
+      </a>
+    </div>
+  </nav>
+
+  <script>
+    const operators = [
+      { id: 'LCO001', name: 'Ramesh Sharma', area: 'Sector 7', boxes: 52, active: 48, inactive: 4, rate: 130 },
+      { id: 'LCO002', name: 'Suresh Patel', area: 'Sector 12', boxes: 68, active: 61, inactive: 7, rate: 140 },
+      { id: 'LCO003', name: 'Amit Verma', area: 'Sector 4', boxes: 45, active: 40, inactive: 5, rate: 135 }
+    ];
+
+    function getLcoId() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('id') || 'LCO001';
+    }
+
+    function render() {
+      const lcoId = getLcoId();
+      const op = operators.find(o => o.id === lcoId);
+      if (!op) {
+        document.body.innerHTML = '<div class="p-5 text-center text-gray-500 mt-10">LCO not found. <a href="../index.html" class="text-blue-600">Login again</a></div>';
+        return;
+      }
+
+      const initials = op.name.split(' ').map(w => w[0]).join('');
+      document.getElementById('avatar').textContent = initials;
+      document.getElementById('greeting').textContent = 'Hello, ' + op.name.split(' ')[0];
+      document.getElementById('operatorInfo').textContent = op.id + ' · ' + op.area;
+      document.getElementById('totalBoxes').textContent = op.boxes;
+      document.getElementById('activeBoxes').textContent = op.active;
+      document.getElementById('inactiveBoxes').textContent = op.inactive;
+
+      const today = new Date();
+      const day = today.getDate();
+      const month = today.toLocaleString('default', { month: 'long' });
+      const year = today.getFullYear();
+
+      let badge, msg, progress;
+      if (day >= 1 && day <= 20) {
+        badge = '<span class="bg-green-50 text-green-600 px-3 py-1 rounded-full text-xs font-medium">Active Window</span>';
+        msg = 'You can activate / deactivate boxes (1st - 20th)';
+        progress = (day / 20) * 100;
+      } else {
+        badge = '<span class="bg-red-50 text-red-500 px-3 py-1 rounded-full text-xs font-medium">Locked</span>';
+        msg = 'Activation/deactivation is locked (21st - month end). Contact Admin for changes.';
+        progress = 100;
+      }
+
+      document.getElementById('activationBadge').innerHTML = badge;
+      document.getElementById('activationMsg').textContent = msg;
+      document.getElementById('progressBar').style.width = progress + '%';
+      document.getElementById('cycleInfo').textContent = month + ' ' + year + ' · Day ' + day + ' of month';
+    }
+
+    render();
+  </script>
+</body>
+</html>

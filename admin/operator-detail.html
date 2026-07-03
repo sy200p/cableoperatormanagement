@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Operator Detail</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="bg-gray-50 font-sans min-h-screen pb-24">
+  <div class="max-w-lg mx-auto">
+    <header class="bg-white px-5 py-4 flex items-center gap-3 border-b border-gray-100 sticky top-0 z-10">
+      <button onclick="window.location.href='operators.html'" class="text-gray-600"><i class="fas fa-arrow-left text-lg"></i></button>
+      <div>
+        <h1 class="text-lg font-bold text-gray-800" id="operatorName">-</h1>
+        <p class="text-xs text-gray-500" id="operatorMeta">-</p>
+      </div>
+    </header>
+
+    <div class="px-4 py-4">
+      <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <p class="text-xs text-gray-400">LCO ID</p>
+            <p class="text-sm font-semibold text-gray-800" id="opId">-</p>
+          </div>
+          <div>
+            <p class="text-xs text-gray-400">Status</p>
+            <p class="text-sm font-semibold" id="opStatus">-</p>
+          </div>
+          <div>
+            <p class="text-xs text-gray-400">Area</p>
+            <p class="text-sm font-semibold text-gray-800" id="opArea">-</p>
+          </div>
+          <div>
+            <p class="text-xs text-gray-400">Join Date</p>
+            <p class="text-sm font-semibold text-gray-800" id="opJoin">-</p>
+          </div>
+          <div>
+            <p class="text-xs text-gray-400">Partnership Rate</p>
+            <p class="text-sm font-bold text-blue-600" id="opRate">-</p>
+          </div>
+          <div>
+            <p class="text-xs text-gray-400">Monthly Payable</p>
+            <p class="text-sm font-bold text-blue-600" id="opPayable">-</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-3 gap-3 mt-4">
+        <div class="bg-white rounded-2xl p-4 text-center shadow-sm border border-gray-100">
+          <p class="text-xs text-gray-400">Total</p>
+          <p class="text-xl font-bold text-gray-800" id="totalBoxes">-</p>
+        </div>
+        <div class="bg-white rounded-2xl p-4 text-center shadow-sm border border-gray-100">
+          <p class="text-xs text-gray-400">Active</p>
+          <p class="text-xl font-bold text-green-600" id="activeBoxes">-</p>
+        </div>
+        <div class="bg-white rounded-2xl p-4 text-center shadow-sm border border-gray-100">
+          <p class="text-xs text-gray-400">Inactive</p>
+          <p class="text-xl font-bold text-red-500" id="inactiveBoxes">-</p>
+        </div>
+      </div>
+
+      <div class="mt-5">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-sm font-bold text-gray-800">Boxes <span class="text-gray-400 font-normal" id="boxCount">(0)</span></h2>
+          <div class="flex gap-2">
+            <button onclick="openAddConnection()" class="text-xs text-blue-600 font-medium">
+              <i class="fas fa-plus mr-1"></i> Add
+            </button>
+            <button onclick="window.location.href='box-shift.html?opId=' + getOperatorId()" class="text-xs text-blue-600 font-medium">
+              <i class="fas fa-exchange-alt mr-1"></i> Shift
+            </button>
+          </div>
+        </div>
+        <div class="space-y-3" id="boxList"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="addConnectionOverlay" class="fixed inset-0 bg-black/40 z-20 hidden" onclick="closeAddConnection()"></div>
+  <div id="addConnectionModal" class="fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl z-30 transform translate-y-full transition-all duration-300 max-w-lg mx-auto shadow-2xl">
+    <div class="p-5">
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="text-lg font-bold text-gray-800">Add New Connection</h2>
+        <button onclick="closeAddConnection()" class="text-gray-400"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="bg-blue-50 border border-blue-100 rounded-xl p-3 mb-4">
+        <p class="text-xs text-blue-700"><i class="fas fa-info-circle mr-1"></i> New box will be assigned to <strong id="assignOpName">-</strong> with <strong>Inactive</strong> status. LCO can activate it later.</p>
+      </div>
+      <div class="space-y-3">
+        <div>
+          <label class="text-xs font-medium text-gray-600 block mb-1">Customer Name</label>
+          <input type="text" id="newCustomerName" class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Full name">
+        </div>
+        <div>
+          <label class="text-xs font-medium text-gray-600 block mb-1">Area / Lane</label>
+          <select id="newCustomerLane" class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+            <option value="Lane 1">Lane 1</option>
+            <option value="Lane 2">Lane 2</option>
+            <option value="Lane 3">Lane 3</option>
+            <option value="Lane 4">Lane 4</option>
+            <option value="Lane 5">Lane 5</option>
+            <option value="Lane 6">Lane 6</option>
+          </select>
+        </div>
+        <div class="bg-gray-50 rounded-xl px-4 py-3">
+          <p class="text-xs text-gray-500">Default Status</p>
+          <p class="text-sm font-medium text-gray-700">Inactive <span class="text-xs text-gray-400">(LCO will activate)</span></p>
+        </div>
+        <button onclick="addConnection()" class="w-full bg-blue-600 text-white py-3.5 rounded-xl font-semibold text-sm mt-2">
+          <i class="fas fa-plus mr-1"></i> Add Connection
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const operators = [
+      { id: 'LCO001', name: 'Ramesh Sharma', area: 'Sector 7', boxes: 52, active: 48, inactive: 4, rate: 130, status: 'active', joinDate: '2024-01-15' },
+      { id: 'LCO002', name: 'Suresh Patel', area: 'Sector 12', boxes: 68, active: 61, inactive: 7, rate: 140, status: 'active', joinDate: '2024-03-20' },
+      { id: 'LCO003', name: 'Amit Verma', area: 'Sector 4', boxes: 45, active: 40, inactive: 5, rate: 135, status: 'active', joinDate: '2024-06-01' },
+      { id: 'LCO004', name: 'Vikram Singh', area: 'Sector 9', boxes: 71, active: 65, inactive: 6, rate: 150, status: 'active', joinDate: '2024-09-10' },
+      { id: 'LCO005', name: 'Pankaj Gupta', area: 'Sector 3', boxes: 38, active: 32, inactive: 6, rate: 125, status: 'active', joinDate: '2024-12-01' },
+      { id: 'LCO006', name: 'Deepak Yadav', area: 'Sector 15', boxes: 28, active: 22, inactive: 6, rate: 120, status: 'active', joinDate: '2025-02-15' },
+      { id: 'LCO007', name: 'Rajesh Kumar', area: 'Sector 8', boxes: 22, active: 18, inactive: 4, rate: 130, status: 'active', joinDate: '2025-04-01' },
+      { id: 'LCO008', name: 'Manoj Tiwari', area: 'Sector 11', boxes: 18, active: 12, inactive: 6, rate: 125, status: 'inactive', joinDate: '2025-05-10' }
+    ];
+
+    const allBoxes = {
+      LCO001: [
+        { id: 'STB-1001', customer: 'Mohan Lal', lane: 'Lane 1', status: 'active', payment: 'paid' },
+        { id: 'STB-1002', customer: 'Sohan Singh', lane: 'Lane 1', status: 'active', payment: 'paid' },
+        { id: 'STB-1003', customer: 'Ramesh Gupta', lane: 'Lane 2', status: 'active', payment: 'unpaid' },
+        { id: 'STB-1004', customer: 'Priti Sharma', lane: 'Lane 2', status: 'inactive', payment: 'unpaid' },
+        { id: 'STB-1005', customer: 'Amit Kumar', lane: 'Lane 1', status: 'active', payment: 'paid' },
+        { id: 'STB-1009', customer: 'Ravi Yadav', lane: 'Lane 3', status: 'pending', payment: 'unpaid' },
+        { id: 'STB-1010', customer: 'Sneha Gupta', lane: 'Lane 2', status: 'pending', payment: 'unpaid' }
+      ],
+      LCO002: [
+        { id: 'STB-2001', customer: 'Rajesh Verma', lane: 'Lane 3', status: 'active', payment: 'paid' },
+        { id: 'STB-2002', customer: 'Sunita Devi', lane: 'Lane 3', status: 'active', payment: 'unpaid' },
+        { id: 'STB-2003', customer: 'Vijay Patel', lane: 'Lane 4', status: 'active', payment: 'paid' },
+        { id: 'STB-2004', customer: 'Anita Singh', lane: 'Lane 4', status: 'inactive', payment: 'unpaid' },
+        { id: 'STB-2005', customer: 'Karan Mehta', lane: 'Lane 3', status: 'pending', payment: 'unpaid' }
+      ],
+      LCO003: [
+        { id: 'STB-3001', customer: 'Ravi Kumar', lane: 'Lane 1', status: 'active', payment: 'paid' },
+        { id: 'STB-3002', customer: 'Neha Gupta', lane: 'Lane 1', status: 'active', payment: 'paid' },
+        { id: 'STB-3003', customer: 'Deepak Jha', lane: 'Lane 2', status: 'inactive', payment: 'unpaid' },
+        { id: 'STB-3004', customer: 'Pooja Sharma', lane: 'Lane 2', status: 'active', payment: 'paid' }
+      ],
+      LCO004: [
+        { id: 'STB-4001', customer: 'Arun Yadav', lane: 'Lane 5', status: 'active', payment: 'paid' },
+        { id: 'STB-4002', customer: 'Bhavna Singh', lane: 'Lane 5', status: 'active', payment: 'paid' },
+        { id: 'STB-4003', customer: 'Chirag Shah', lane: 'Lane 6', status: 'active', payment: 'unpaid' }
+      ],
+      LCO005: [
+        { id: 'STB-5001', customer: 'Divya Sharma', lane: 'Lane 1', status: 'active', payment: 'paid' },
+        { id: 'STB-5002', customer: 'Ekta Kapoor', lane: 'Lane 1', status: 'inactive', payment: 'unpaid' }
+      ],
+      LCO006: [
+        { id: 'STB-6001', customer: 'Farhan Khan', lane: 'Lane 2', status: 'active', payment: 'paid' },
+        { id: 'STB-6002', customer: 'Gauri Joshi', lane: 'Lane 2', status: 'active', payment: 'paid' }
+      ],
+      LCO007: [
+        { id: 'STB-7001', customer: 'Harsh Mehta', lane: 'Lane 3', status: 'active', payment: 'paid' }
+      ],
+      LCO008: [
+        { id: 'STB-8001', customer: 'Ishaan Roy', lane: 'Lane 1', status: 'inactive', payment: 'unpaid' }
+      ]
+    };
+
+    function getOperatorId() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('id') || 'LCO001';
+    }
+
+    function openAddConnection() {
+      const opId = getOperatorId();
+      const op = operators.find(o => o.id === opId);
+      document.getElementById('assignOpName').textContent = op.name + ' (' + op.id + ')';
+      document.getElementById('addConnectionModal').classList.remove('translate-y-full');
+      document.getElementById('addConnectionOverlay').classList.remove('hidden');
+    }
+
+    function closeAddConnection() {
+      document.getElementById('addConnectionModal').classList.add('translate-y-full');
+      document.getElementById('addConnectionOverlay').classList.add('hidden');
+    }
+
+    function addConnection() {
+      const name = document.getElementById('newCustomerName').value.trim();
+      const lane = document.getElementById('newCustomerLane').value;
+      if (!name) { alert('Please enter customer name'); return; }
+
+      const opId = getOperatorId();
+      const op = operators.find(o => o.id === opId);
+      const existing = allBoxes[opId] || [];
+      const lastNum = existing.reduce((max, b) => {
+        const num = parseInt(b.id.split('-')[1]);
+        return num > max ? num : max;
+      }, parseInt(opId.replace('LCO', '')) * 100);
+      const newId = 'STB-' + (lastNum + 1);
+
+      if (!allBoxes[opId]) allBoxes[opId] = [];
+      allBoxes[opId].push({ id: newId, customer: name, lane, status: 'inactive', payment: 'unpaid' });
+
+      op.boxes++;
+      op.inactive++;
+
+      document.getElementById('newCustomerName').value = '';
+      closeAddConnection();
+      render();
+
+      const toast = document.createElement('div');
+      toast.className = 'fixed bottom-24 left-4 right-4 max-w-lg mx-auto bg-green-600 text-white text-sm text-center py-3 px-4 rounded-xl shadow-lg z-50 animate-bounce';
+      toast.textContent = 'Connection ' + newId + ' added for ' + name + ' under ' + op.name;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+
+    function statusBadge(status) {
+      if (status === 'active') return '<span class="bg-green-50 text-green-600 px-2.5 py-1 rounded-full text-xs font-medium">Active</span>';
+      if (status === 'inactive') return '<span class="bg-red-50 text-red-500 px-2.5 py-1 rounded-full text-xs font-medium">Inactive</span>';
+      return '<span class="bg-yellow-50 text-yellow-600 px-2.5 py-1 rounded-full text-xs font-medium"><i class="fas fa-clock mr-0.5"></i>Pending</span>';
+    }
+
+    function render() {
+      const opId = getOperatorId();
+      const op = operators.find(o => o.id === opId);
+      if (!op) { document.body.innerHTML = '<div class="p-5 text-center text-gray-500">Operator not found</div>'; return; }
+
+      document.getElementById('operatorName').textContent = op.name;
+      document.getElementById('operatorMeta').textContent = op.area + ' · ' + op.id;
+      document.getElementById('opId').textContent = op.id;
+      document.getElementById('opStatus').innerHTML = `<span class="px-2 py-0.5 ${op.status === 'active' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-500'} rounded-full text-xs font-medium">${op.status === 'active' ? 'Active' : 'Inactive'}</span>`;
+      document.getElementById('opArea').textContent = op.area;
+      document.getElementById('opJoin').textContent = op.joinDate;
+      document.getElementById('opRate').textContent = '₹' + op.rate;
+      document.getElementById('opPayable').textContent = '₹' + (op.rate * op.active).toLocaleString();
+      document.getElementById('totalBoxes').textContent = op.boxes;
+      document.getElementById('activeBoxes').textContent = op.active;
+      document.getElementById('inactiveBoxes').textContent = op.inactive;
+
+      const boxes = allBoxes[opId] || [];
+      const pendingBoxes = boxes.filter(b => b.status === 'pending');
+      const otherBoxes = boxes.filter(b => b.status !== 'pending');
+
+      document.getElementById('boxCount').textContent = `(${boxes.length})`;
+      const list = document.getElementById('boxList');
+
+      let html = '';
+
+      if (pendingBoxes.length > 0) {
+        html += `<div class="flex items-center gap-2 mb-2"><i class="fas fa-clock text-yellow-500 text-xs"></i><span class="text-xs font-semibold text-yellow-700">Pending Approvals (${pendingBoxes.length})</span></div>`;
+        html += pendingBoxes.map(b => `
+          <div class="bg-yellow-50 rounded-2xl p-4 shadow-sm border border-yellow-200">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm font-semibold text-gray-800">${b.customer}</p>
+                <p class="text-xs text-gray-500">${b.id} · ${b.lane}</p>
+              </div>
+              <span class="px-2.5 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-medium"><i class="fas fa-clock mr-0.5"></i>Pending</span>
+            </div>
+            <p class="text-xs text-gray-400 mt-1">Requested by LCO · Awaiting your approval</p>
+            <div class="flex gap-2 mt-3">
+              <button onclick="approveBox('${b.id}')" class="flex-1 py-2.5 bg-green-500 text-white rounded-xl text-xs font-medium"><i class="fas fa-check mr-1"></i>Approve</button>
+              <button onclick="rejectBox('${b.id}')" class="flex-1 py-2.5 bg-red-100 text-red-600 rounded-xl text-xs font-medium"><i class="fas fa-times mr-1"></i>Reject</button>
+            </div>
+          </div>
+        `).join('');
+        html += '<div class="mt-3"></div>';
+      }
+
+      if (otherBoxes.length > 0) {
+        html += otherBoxes.map(b => `
+          <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm font-semibold text-gray-800">${b.customer}</p>
+                <p class="text-xs text-gray-500">${b.id} · ${b.lane}</p>
+              </div>
+              ${statusBadge(b.status)}
+            </div>
+            <div class="flex items-center gap-2 mt-2">
+              <span class="text-xs ${b.payment === 'paid' ? 'text-green-600' : 'text-orange-500'}">
+                <i class="fas fa-${b.payment === 'paid' ? 'check-circle' : 'times-circle'} mr-1"></i>${b.payment === 'paid' ? 'Paid' : 'Unpaid'}
+              </span>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      if (boxes.length === 0) {
+        html = '<div class="text-center py-8 text-gray-400 text-sm">No boxes assigned to this operator</div>';
+      }
+
+      list.innerHTML = html;
+    }
+
+    function approveBox(boxId) {
+      const opId = getOperatorId();
+      const op = operators.find(o => o.id === opId);
+      const box = allBoxes[opId]?.find(b => b.id === boxId);
+      if (!box) return;
+      box.status = 'active';
+      box.payment = 'unpaid';
+      op.boxes++;
+      op.active++;
+      render();
+      const toast = document.createElement('div');
+      toast.className = 'fixed bottom-24 left-4 right-4 max-w-lg mx-auto bg-green-600 text-white text-sm text-center py-3 px-4 rounded-xl shadow-lg z-50 animate-bounce';
+      toast.textContent = `${box.customer} (${box.id}) approved and activated.`;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+
+    function rejectBox(boxId) {
+      const opId = getOperatorId();
+      const op = operators.find(o => o.id === opId);
+      const idx = allBoxes[opId]?.findIndex(b => b.id === boxId);
+      if (idx === undefined || idx < 0) return;
+      const box = allBoxes[opId][idx];
+      allBoxes[opId].splice(idx, 1);
+      render();
+      const toast = document.createElement('div');
+      toast.className = 'fixed bottom-24 left-4 right-4 max-w-lg mx-auto bg-red-500 text-white text-sm text-center py-3 px-4 rounded-xl shadow-lg z-50';
+      toast.textContent = `${box.customer} (${box.id}) request rejected.`;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+
+    render();
+  </script>
+</body>
+</html>

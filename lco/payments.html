@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Customer Payments</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="bg-gray-50 font-sans min-h-screen pb-20">
+  <div class="max-w-lg mx-auto">
+    <header class="bg-white px-5 py-4 flex items-center gap-3 border-b border-gray-100 sticky top-0 z-10">
+      <button onclick="window.location.href='dashboard.html'" class="text-gray-600"><i class="fas fa-arrow-left text-lg"></i></button>
+      <div>
+        <h1 class="text-lg font-bold text-gray-800">Payments</h1>
+        <p class="text-xs text-gray-500" id="paymentSubtitle">Mark customers Paid / Unpaid</p>
+      </div>
+    </header>
+
+    <div class="px-4 py-4">
+      <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 mb-4">
+        <div class="flex items-center gap-4">
+          <div class="flex-1">
+            <label class="text-xs font-medium text-gray-600 block mb-1.5">Status Filter</label>
+            <select id="statusFilter" onchange="applyFilters()" class="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+              <option value="all">All Status</option>
+              <option value="paid">Paid</option>
+              <option value="unpaid">Unpaid</option>
+            </select>
+          </div>
+          <div class="flex-1">
+            <label class="text-xs font-medium text-gray-600 block mb-1.5">Area Filter</label>
+            <select id="areaFilter" onchange="applyFilters()" class="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+              <option value="all">All Areas</option>
+              <option value="Lane 1">Lane 1</option>
+              <option value="Lane 2">Lane 2</option>
+              <option value="Lane 3">Lane 3</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-sm font-bold text-gray-800">Customers</h2>
+        <span class="text-xs text-gray-500" id="filterCount">Showing all</span>
+      </div>
+      <div class="space-y-3" id="customerList"></div>
+    </div>
+  </div>
+
+  <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-10 max-w-lg mx-auto">
+    <div class="flex justify-around py-2">
+      <a href="dashboard.html" class="flex flex-col items-center px-4 py-1 text-gray-400">
+        <i class="fas fa-home text-lg"></i>
+        <span class="text-xs mt-0.5">Home</span>
+      </a>
+      <a href="boxes.html" class="flex flex-col items-center px-4 py-1 text-gray-400">
+        <i class="fas fa-box text-lg"></i>
+        <span class="text-xs mt-0.5">Boxes</span>
+      </a>
+      <a href="payments.html" class="flex flex-col items-center px-4 py-1 text-blue-600">
+        <i class="fas fa-credit-card text-lg"></i>
+        <span class="text-xs font-medium mt-0.5">Payments</span>
+      </a>
+      <a href="my-payment.html" class="flex flex-col items-center px-4 py-1 text-gray-400">
+        <i class="fas fa-wallet text-lg"></i>
+        <span class="text-xs mt-0.5">My Dues</span>
+      </a>
+    </div>
+  </nav>
+
+  <script>
+    const allCustomers = {
+      LCO001: [
+        { id: 'STB-1001', customer: 'Mohan Lal', lane: 'Lane 1', payment: 'paid', status: 'active' },
+        { id: 'STB-1002', customer: 'Sohan Singh', lane: 'Lane 1', payment: 'paid', status: 'active' },
+        { id: 'STB-1003', customer: 'Ramesh Gupta', lane: 'Lane 2', payment: 'unpaid', status: 'active' },
+        { id: 'STB-1004', customer: 'Priti Sharma', lane: 'Lane 2', payment: 'unpaid', status: 'inactive' },
+        { id: 'STB-1005', customer: 'Amit Kumar', lane: 'Lane 1', payment: 'paid', status: 'active' },
+        { id: 'STB-1006', customer: 'Sunita Devi', lane: 'Lane 3', payment: 'paid', status: 'active' },
+        { id: 'STB-1007', customer: 'Vijay Singh', lane: 'Lane 3', payment: 'unpaid', status: 'inactive' },
+        { id: 'STB-1008', customer: 'Neha Sharma', lane: 'Lane 2', payment: 'unpaid', status: 'active' },
+        { id: 'STB-1009', customer: 'Ravi Yadav', lane: 'Lane 3', payment: 'unpaid', status: 'pending' },
+        { id: 'STB-1010', customer: 'Sneha Gupta', lane: 'Lane 2', payment: 'unpaid', status: 'pending' }
+      ],
+      LCO002: [
+        { id: 'STB-2001', customer: 'Rajesh Verma', lane: 'Lane 3', payment: 'paid', status: 'active' },
+        { id: 'STB-2002', customer: 'Sunita Devi', lane: 'Lane 3', payment: 'unpaid', status: 'active' },
+        { id: 'STB-2003', customer: 'Vijay Patel', lane: 'Lane 4', payment: 'paid', status: 'active' },
+        { id: 'STB-2004', customer: 'Anita Singh', lane: 'Lane 4', payment: 'unpaid', status: 'inactive' },
+        { id: 'STB-2005', customer: 'Karan Mehta', lane: 'Lane 3', payment: 'unpaid', status: 'pending' }
+      ],
+      LCO003: [
+        { id: 'STB-3001', customer: 'Ravi Kumar', lane: 'Lane 1', payment: 'paid', status: 'active' },
+        { id: 'STB-3002', customer: 'Neha Gupta', lane: 'Lane 1', payment: 'paid', status: 'active' },
+        { id: 'STB-3003', customer: 'Deepak Jha', lane: 'Lane 2', payment: 'unpaid', status: 'inactive' },
+        { id: 'STB-3004', customer: 'Pooja Sharma', lane: 'Lane 2', payment: 'paid', status: 'active' }
+      ]
+    };
+
+    function statusBadge(status) {
+      if (status === 'active') return '<span class="bg-green-50 text-green-600 px-2.5 py-1 rounded-full text-xs font-medium">Active</span>';
+      if (status === 'inactive') return '<span class="bg-red-50 text-red-500 px-2.5 py-1 rounded-full text-xs font-medium">Inactive</span>';
+      return '<span class="bg-yellow-50 text-yellow-600 px-2.5 py-1 rounded-full text-xs font-medium"><i class="fas fa-clock mr-0.5"></i>Pending</span>';
+    }
+
+    function getLcoId() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('id') || 'LCO001';
+    }
+
+    function applyFilters() {
+      const lcoId = getLcoId();
+      const customers = allCustomers[lcoId] || [];
+      const statusFilter = document.getElementById('statusFilter').value;
+      const areaFilter = document.getElementById('areaFilter').value;
+
+      let filtered = customers;
+      if (statusFilter !== 'all') filtered = filtered.filter(c => c.payment === statusFilter);
+      if (areaFilter !== 'all') filtered = filtered.filter(c => c.lane === areaFilter);
+
+      document.getElementById('filterCount').textContent = 'Showing ' + filtered.length + ' of ' + customers.length;
+
+      const list = document.getElementById('customerList');
+      list.innerHTML = filtered.map(c => `
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 ${c.status === 'pending' ? 'bg-yellow-100' : c.payment === 'paid' ? 'bg-green-100' : 'bg-orange-100'} rounded-xl flex items-center justify-center ${c.status === 'pending' ? 'text-yellow-600' : c.payment === 'paid' ? 'text-green-600' : 'text-orange-500'} font-bold text-xs">${c.customer.charAt(0)}</div>
+              <div>
+                <p class="text-sm font-semibold text-gray-800">${c.customer}</p>
+                <p class="text-xs text-gray-500">${c.id} · ${c.lane}</p>
+              </div>
+            </div>
+            ${statusBadge(c.status)}
+          </div>
+          <div class="flex items-center justify-between mt-3 pt-3 border-t border-gray-50">
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-gray-500">Payment:</span>
+              ${c.status === 'pending'
+                ? '<span class="text-xs text-yellow-600"><i class="fas fa-clock mr-1"></i>Awaiting approval</span>'
+                : `<button onclick="togglePayment('${c.id}')" class="px-3 py-1.5 rounded-full text-xs font-medium transition-all ${c.payment === 'paid' ? 'bg-green-50 text-green-600 border border-green-200' : 'bg-orange-50 text-orange-500 border border-orange-200'}">
+                <i class="fas fa-${c.payment === 'paid' ? 'check-circle' : 'times-circle'} mr-1"></i>${c.payment === 'paid' ? 'Paid' : 'Unpaid'}
+              </button>`}
+            </div>
+            ${c.status === 'pending' ? '' : '<i class="fas fa-exchange-alt text-gray-300 text-xs"></i>'}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function togglePayment(boxId) {
+      const lcoId = getLcoId();
+      const customers = allCustomers[lcoId] || [];
+      const c = customers.find(c => c.id === boxId);
+      if (!c) return;
+      if (c.status === 'pending') {
+        alert('Cannot change payment status. Connection is pending Admin approval.');
+        return;
+      }
+      c.payment = c.payment === 'paid' ? 'unpaid' : 'paid';
+      applyFilters();
+    }
+
+    applyFilters();
+  </script>
+</body>
+</html>

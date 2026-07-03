@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Shift Box</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="bg-gray-50 font-sans min-h-screen pb-24">
+  <div class="max-w-lg mx-auto">
+    <header class="bg-white px-5 py-4 flex items-center gap-3 border-b border-gray-100 sticky top-0 z-10">
+      <button onclick="window.location.href='operator-detail.html?id=' + getSourceOp()" class="text-gray-600"><i class="fas fa-arrow-left text-lg"></i></button>
+      <div>
+        <h1 class="text-lg font-bold text-gray-800">Shift Box</h1>
+        <p class="text-xs text-gray-500">Move box from one operator to another</p>
+      </div>
+    </header>
+
+    <div class="px-4 py-4">
+      <div class="bg-yellow-50 border border-yellow-200 rounded-2xl p-4 mb-4">
+        <div class="flex gap-2">
+          <i class="fas fa-info-circle text-yellow-600 mt-0.5"></i>
+          <div>
+            <p class="text-xs font-medium text-yellow-800">Box status (active/inactive) will remain same after shift. Admin can change later.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 mb-4">
+        <h2 class="text-sm font-bold text-gray-800 mb-4">Select Box to Shift</h2>
+        <div class="space-y-2" id="sourceBoxes"></div>
+      </div>
+
+      <div id="shiftForm" class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hidden">
+        <h2 class="text-sm font-bold text-gray-800 mb-4">Shift To</h2>
+        <div class="space-y-3">
+          <div>
+            <label class="text-xs font-medium text-gray-600 block mb-1">Selected Box</label>
+            <div class="bg-gray-50 rounded-xl px-4 py-3 text-sm font-medium text-gray-800" id="selectedBoxDisplay">-</div>
+          </div>
+          <div>
+            <label class="text-xs font-medium text-gray-600 block mb-1">Target Operator</label>
+            <select id="targetOperator" class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+              <option value="">Select operator...</option>
+            </select>
+          </div>
+          <button onclick="confirmShift()" class="w-full bg-blue-600 text-white py-3.5 rounded-xl font-semibold text-sm">
+            <i class="fas fa-exchange-alt mr-1"></i> Shift Box
+          </button>
+        </div>
+      </div>
+
+      <div class="mt-5">
+        <h2 class="text-sm font-bold text-gray-800 mb-3">Shift History (Audit)</h2>
+        <div class="space-y-3" id="shiftHistory"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="successOverlay" class="fixed inset-0 bg-black/40 z-20 hidden" onclick="closeSuccess()"></div>
+  <div id="successModal" class="fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl z-30 transform translate-y-full transition-all duration-300 max-w-lg mx-auto shadow-2xl">
+    <div class="p-5 text-center">
+      <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+        <i class="fas fa-check text-green-500 text-2xl"></i>
+      </div>
+      <h2 class="text-lg font-bold text-gray-800 mb-1">Box Shifted Successfully</h2>
+      <p class="text-sm text-gray-500" id="successMsg">-</p>
+      <button onclick="closeSuccess()" class="w-full bg-blue-600 text-white py-3.5 rounded-xl font-semibold text-sm mt-4">Done</button>
+    </div>
+  </div>
+
+  <script>
+    const operators = [
+      { id: 'LCO001', name: 'Ramesh Sharma', area: 'Sector 7' },
+      { id: 'LCO002', name: 'Suresh Patel', area: 'Sector 12' },
+      { id: 'LCO003', name: 'Amit Verma', area: 'Sector 4' },
+      { id: 'LCO004', name: 'Vikram Singh', area: 'Sector 9' },
+      { id: 'LCO005', name: 'Pankaj Gupta', area: 'Sector 3' },
+      { id: 'LCO006', name: 'Deepak Yadav', area: 'Sector 15' },
+      { id: 'LCO007', name: 'Rajesh Kumar', area: 'Sector 8' }
+    ];
+
+    const shiftHistoryData = [
+      { box: 'STB-1003', from: 'Ramesh Sharma', to: 'Suresh Patel', date: '2025-06-15', status: 'active' },
+      { box: 'STB-2004', from: 'Suresh Patel', to: 'Amit Verma', date: '2025-05-20', status: 'inactive' },
+      { box: 'STB-4002', from: 'Vikram Singh', to: 'Pankaj Gupta', date: '2025-04-10', status: 'active' }
+    ];
+
+    const allBoxes = {
+      LCO001: [
+        { id: 'STB-1001', customer: 'Mohan Lal', lane: 'Lane 1', status: 'active' },
+        { id: 'STB-1002', customer: 'Sohan Singh', lane: 'Lane 1', status: 'active' },
+        { id: 'STB-1003', customer: 'Ramesh Gupta', lane: 'Lane 2', status: 'active' },
+        { id: 'STB-1004', customer: 'Priti Sharma', lane: 'Lane 2', status: 'inactive' },
+        { id: 'STB-1005', customer: 'Amit Kumar', lane: 'Lane 1', status: 'active' }
+      ],
+      LCO002: [
+        { id: 'STB-2001', customer: 'Rajesh Verma', lane: 'Lane 3', status: 'active' },
+        { id: 'STB-2002', customer: 'Sunita Devi', lane: 'Lane 3', status: 'active' },
+        { id: 'STB-2003', customer: 'Vijay Patel', lane: 'Lane 4', status: 'active' },
+        { id: 'STB-2004', customer: 'Anita Singh', lane: 'Lane 4', status: 'inactive' }
+      ],
+      LCO003: [
+        { id: 'STB-3001', customer: 'Ravi Kumar', lane: 'Lane 1', status: 'active' },
+        { id: 'STB-3002', customer: 'Neha Gupta', lane: 'Lane 1', status: 'active' },
+        { id: 'STB-3003', customer: 'Deepak Jha', lane: 'Lane 2', status: 'inactive' },
+        { id: 'STB-3004', customer: 'Pooja Sharma', lane: 'Lane 2', status: 'active' }
+      ],
+      LCO004: [
+        { id: 'STB-4001', customer: 'Arun Yadav', lane: 'Lane 5', status: 'active' },
+        { id: 'STB-4002', customer: 'Bhavna Singh', lane: 'Lane 5', status: 'active' },
+        { id: 'STB-4003', customer: 'Chirag Shah', lane: 'Lane 6', status: 'active' }
+      ],
+      LCO005: [
+        { id: 'STB-5001', customer: 'Divya Sharma', lane: 'Lane 1', status: 'active' },
+        { id: 'STB-5002', customer: 'Ekta Kapoor', lane: 'Lane 1', status: 'inactive' }
+      ],
+      LCO006: [
+        { id: 'STB-6001', customer: 'Farhan Khan', lane: 'Lane 2', status: 'active' },
+        { id: 'STB-6002', customer: 'Gauri Joshi', lane: 'Lane 2', status: 'active' }
+      ],
+      LCO007: [
+        { id: 'STB-7001', customer: 'Harsh Mehta', lane: 'Lane 3', status: 'active' }
+      ]
+    };
+
+    function getSourceOp() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('opId') || 'LCO001';
+    }
+
+    let selectedBox = null;
+
+    function render() {
+      const opId = getSourceOp();
+      const op = operators.find(o => o.id === opId);
+      const boxes = allBoxes[opId] || [];
+
+      const list = document.getElementById('sourceBoxes');
+      list.innerHTML = boxes.map(b => `
+        <label class="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-3 cursor-pointer ${selectedBox?.id === b.id ? 'ring-2 ring-blue-500 bg-blue-50' : ''}">
+          <div class="flex items-center gap-3">
+            <input type="radio" name="boxSelect" value="${b.id}" ${selectedBox?.id === b.id ? 'checked' : ''} onchange="selectBox('${b.id}')" class="accent-blue-600">
+            <div>
+              <p class="text-sm font-medium text-gray-800">${b.customer}</p>
+              <p class="text-xs text-gray-500">${b.id} · ${b.lane}</p>
+            </div>
+          </div>
+          <span class="px-2 py-0.5 ${b.status === 'active' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-500'} rounded-full text-xs font-medium">${b.status === 'active' ? 'Active' : 'Inactive'}</span>
+        </label>
+      `).join('');
+
+      const targetSelect = document.getElementById('targetOperator');
+      targetSelect.innerHTML = '<option value="">Select operator...</option>' +
+        operators.filter(o => o.id !== opId).map(o =>
+          `<option value="${o.id}">${o.name} (${o.area})</option>`
+        ).join('');
+
+      const historyList = document.getElementById('shiftHistory');
+      historyList.innerHTML = shiftHistoryData.map(h => `
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-sm font-medium text-gray-800">${h.box}</span>
+            <span class="px-2 py-0.5 ${h.status === 'active' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-500'} rounded-full text-xs font-medium">${h.status === 'active' ? 'Active' : 'Inactive'}</span>
+          </div>
+          <div class="flex items-center gap-2 text-xs text-gray-500">
+            <span class="font-medium text-gray-700">${h.from}</span>
+            <i class="fas fa-arrow-right text-blue-400"></i>
+            <span class="font-medium text-gray-700">${h.to}</span>
+          </div>
+          <p class="text-xs text-gray-400 mt-1">${h.date}</p>
+        </div>
+      `).join('');
+    }
+
+    function selectBox(boxId) {
+      const opId = getSourceOp();
+      const boxes = allBoxes[opId] || [];
+      selectedBox = boxes.find(b => b.id === boxId);
+      document.getElementById('shiftForm').classList.remove('hidden');
+      document.getElementById('selectedBoxDisplay').textContent = `${selectedBox.customer} (${selectedBox.id})`;
+      render();
+    }
+
+    function confirmShift() {
+      if (!selectedBox) { alert('Please select a box'); return; }
+      const target = document.getElementById('targetOperator').value;
+      if (!target) { alert('Please select target operator'); return; }
+      const targetOp = operators.find(o => o.id === target);
+      document.getElementById('successMsg').textContent = `${selectedBox.id} (${selectedBox.customer}) shifted to ${targetOp.name} (${targetOp.area})`;
+      document.getElementById('successModal').classList.remove('translate-y-full');
+      document.getElementById('successOverlay').classList.remove('hidden');
+      shiftHistoryData.unshift({ box: selectedBox.id, from: operators.find(o => o.id === getSourceOp()).name, to: targetOp.name, date: new Date().toISOString().split('T')[0], status: selectedBox.status });
+    }
+
+    function closeSuccess() {
+      document.getElementById('successModal').classList.add('translate-y-full');
+      document.getElementById('successOverlay').classList.add('hidden');
+      document.getElementById('shiftForm').classList.add('hidden');
+      selectedBox = null;
+      render();
+    }
+
+    render();
+  </script>
+</body>
+</html>

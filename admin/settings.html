@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Settings</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="bg-gray-50 font-sans min-h-screen pb-24">
+  <div class="max-w-lg mx-auto">
+    <header class="bg-white px-5 py-4 flex items-center gap-3 border-b border-gray-100 sticky top-0 z-10">
+      <button onclick="window.location.href='dashboard.html'" class="text-gray-600"><i class="fas fa-arrow-left text-lg"></i></button>
+      <div>
+        <h1 class="text-lg font-bold text-gray-800">Settings</h1>
+        <p class="text-xs text-gray-500">Global configuration</p>
+      </div>
+    </header>
+
+    <div class="px-4 py-4 space-y-4">
+      <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+        <h2 class="text-sm font-bold text-gray-800 mb-4">Customer Box Rate</h2>
+        <div class="bg-blue-50 border border-blue-100 rounded-xl p-3 mb-4">
+          <div class="flex items-center gap-2">
+            <i class="fas fa-info-circle text-blue-600 text-sm"></i>
+            <p class="text-xs text-blue-700">This rate is global for all operators. Changes apply from <strong>next billing cycle</strong> for each operator.</p>
+          </div>
+        </div>
+        <div class="flex items-center justify-between mb-4">
+          <span class="text-sm text-gray-600">Current Rate</span>
+          <span class="text-2xl font-bold text-gray-800">₹<span id="currentRate">300</span></span>
+        </div>
+        <div class="space-y-3">
+          <div>
+            <label class="text-xs font-medium text-gray-600 block mb-1">New Rate (₹)</label>
+            <input type="number" id="newRate" class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Enter new rate" value="350">
+          </div>
+          <button onclick="updateRate()" class="w-full bg-blue-600 text-white py-3.5 rounded-xl font-semibold text-sm">
+            Update Rate
+          </button>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-sm font-bold text-gray-800">Billing Cycle Info</h2>
+          <span class="text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded-full font-medium">Next cycle</span>
+        </div>
+        <div class="space-y-3">
+          <div class="flex justify-between items-center">
+            <span class="text-sm text-gray-600">Current Cycle</span>
+            <span class="text-sm font-semibold text-gray-800">June 15 - July 14</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-sm text-gray-600">Next Cycle Starts</span>
+            <span class="text-sm font-semibold text-gray-800">July 15</span>
+          </div>
+          <div class="pt-3 border-t border-gray-100">
+            <p class="text-xs text-gray-500">Each operator's billing cycle is based on their join date. Example: Operator joining on 15th will have cycle from 15th to 14th every month.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+        <h2 class="text-sm font-bold text-gray-800 mb-4">Rate Change Log</h2>
+        <div class="space-y-3" id="rateChangeLog">
+          <div class="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-3">
+            <div>
+              <p class="text-sm font-medium text-gray-800">₹300 → ₹350 (Customer Rate)</p>
+              <p class="text-xs text-gray-500">Effective from next cycle</p>
+            </div>
+            <span class="text-xs text-yellow-600 font-medium">Pending</span>
+          </div>
+          <div class="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-3">
+            <div>
+              <p class="text-sm font-medium text-gray-800">₹280 → ₹300 (Customer Rate)</p>
+              <p class="text-xs text-gray-500">Effective from May 15 cycle</p>
+            </div>
+            <span class="text-xs text-green-600 font-medium">Applied</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function updateRate() {
+      const rate = document.getElementById('newRate').value;
+      if (!rate || rate < 100) { alert('Please enter a valid rate (min ₹100)'); return; }
+      alert(`Customer box rate will change from ₹${document.getElementById('currentRate').textContent} to ₹${rate} from next billing cycle for each operator.`);
+      document.getElementById('currentRate').textContent = rate;
+    }
+  </script>
+</body>
+</html>

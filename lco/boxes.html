@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>My Boxes</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="bg-gray-50 font-sans min-h-screen pb-20">
+  <div class="max-w-lg mx-auto">
+    <header class="bg-white px-5 py-4 flex items-center gap-3 border-b border-gray-100 sticky top-0 z-10">
+      <button onclick="window.location.href='dashboard.html'" class="text-gray-600"><i class="fas fa-arrow-left text-lg"></i></button>
+      <div>
+        <h1 class="text-lg font-bold text-gray-800">My Boxes</h1>
+        <p class="text-xs text-gray-500" id="boxSubtitle">-</p>
+      </div>
+    </header>
+
+    <div class="px-4 py-4">
+      <div id="lockBanner" class="bg-red-50 border border-red-200 rounded-2xl p-4 mb-4 hidden">
+        <div class="flex gap-2">
+          <i class="fas fa-lock text-red-500 mt-0.5"></i>
+          <div>
+            <p class="text-xs font-medium text-red-800">Activation/Deactivation Locked</p>
+            <p class="text-xs text-red-600">Contact Admin for changes (21st - month end). Auto-reopens on 1st.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex gap-2 mb-4 overflow-x-auto pb-1">
+        <button class="px-4 py-2 bg-blue-600 text-white rounded-full text-xs font-medium whitespace-nowrap" onclick="filterBoxes('all')" id="bfAll">All</button>
+        <button class="px-4 py-2 bg-white text-gray-600 rounded-full text-xs font-medium border border-gray-200 whitespace-nowrap" onclick="filterBoxes('active')" id="bfActive">Active</button>
+        <button class="px-4 py-2 bg-white text-gray-600 rounded-full text-xs font-medium border border-gray-200 whitespace-nowrap" onclick="filterBoxes('inactive')" id="bfInactive">Inactive</button>
+        <button class="px-4 py-2 bg-white text-gray-600 rounded-full text-xs font-medium border border-gray-200 whitespace-nowrap" onclick="filterBoxes('pending')" id="bfPending">Pending</button>
+      </div>
+
+      <button onclick="openRequestModal()" class="w-full bg-blue-50 border-2 border-dashed border-blue-200 rounded-2xl py-4 text-blue-600 font-medium text-sm mb-4 hover:bg-blue-100 transition-all">
+        <i class="fas fa-plus-circle mr-1"></i> Request New Connection
+      </button>
+
+      <div class="space-y-3" id="boxList"></div>
+    </div>
+  </div>
+
+  <div id="requestOverlay" class="fixed inset-0 bg-black/40 z-20 hidden" onclick="closeRequestModal()"></div>
+  <div id="requestModal" class="fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl z-30 transform translate-y-full transition-all duration-300 max-w-lg mx-auto shadow-2xl">
+    <div class="p-5">
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="text-lg font-bold text-gray-800">Request New Connection</h2>
+        <button onclick="closeRequestModal()" class="text-gray-400"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-3 mb-4">
+        <p class="text-xs text-yellow-700"><i class="fas fa-clock mr-1"></i> Your request will be submitted to Admin for approval. Box will work only after Admin approves.</p>
+      </div>
+      <div class="space-y-3">
+        <div>
+          <label class="text-xs font-medium text-gray-600 block mb-1">Customer Name</label>
+          <input type="text" id="reqCustomerName" class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Full name">
+        </div>
+        <div>
+          <label class="text-xs font-medium text-gray-600 block mb-1">Area / Lane</label>
+          <select id="reqCustomerLane" class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+            <option value="Lane 1">Lane 1</option>
+            <option value="Lane 2">Lane 2</option>
+            <option value="Lane 3">Lane 3</option>
+            <option value="Lane 4">Lane 4</option>
+            <option value="Lane 5">Lane 5</option>
+            <option value="Lane 6">Lane 6</option>
+          </select>
+        </div>
+        <button onclick="submitRequest()" class="w-full bg-blue-600 text-white py-3.5 rounded-xl font-semibold text-sm mt-2">
+          <i class="fas fa-paper-plane mr-1"></i> Submit for Approval
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-10 max-w-lg mx-auto">
+    <div class="flex justify-around py-2">
+      <a href="dashboard.html" class="flex flex-col items-center px-4 py-1 text-gray-400">
+        <i class="fas fa-home text-lg"></i>
+        <span class="text-xs mt-0.5">Home</span>
+      </a>
+      <a href="boxes.html" class="flex flex-col items-center px-4 py-1 text-blue-600">
+        <i class="fas fa-box text-lg"></i>
+        <span class="text-xs font-medium mt-0.5">Boxes</span>
+      </a>
+      <a href="payments.html" class="flex flex-col items-center px-4 py-1 text-gray-400">
+        <i class="fas fa-credit-card text-lg"></i>
+        <span class="text-xs mt-0.5">Payments</span>
+      </a>
+      <a href="my-payment.html" class="flex flex-col items-center px-4 py-1 text-gray-400">
+        <i class="fas fa-wallet text-lg"></i>
+        <span class="text-xs mt-0.5">My Dues</span>
+      </a>
+    </div>
+  </nav>
+
+  <script>
+    const allBoxesData = {
+      LCO001: [
+        { id: 'STB-1001', customer: 'Mohan Lal', lane: 'Lane 1', status: 'active', payment: 'paid' },
+        { id: 'STB-1002', customer: 'Sohan Singh', lane: 'Lane 1', status: 'active', payment: 'paid' },
+        { id: 'STB-1003', customer: 'Ramesh Gupta', lane: 'Lane 2', status: 'active', payment: 'unpaid' },
+        { id: 'STB-1004', customer: 'Priti Sharma', lane: 'Lane 2', status: 'inactive', payment: 'unpaid' },
+        { id: 'STB-1005', customer: 'Amit Kumar', lane: 'Lane 1', status: 'active', payment: 'paid' },
+        { id: 'STB-1006', customer: 'Sunita Devi', lane: 'Lane 3', status: 'active', payment: 'paid' },
+        { id: 'STB-1007', customer: 'Vijay Singh', lane: 'Lane 3', status: 'inactive', payment: 'unpaid' },
+        { id: 'STB-1008', customer: 'Neha Sharma', lane: 'Lane 2', status: 'active', payment: 'unpaid' },
+        { id: 'STB-1009', customer: 'Ravi Yadav', lane: 'Lane 3', status: 'pending', payment: 'unpaid' },
+        { id: 'STB-1010', customer: 'Sneha Gupta', lane: 'Lane 2', status: 'pending', payment: 'unpaid' }
+      ],
+      LCO002: [
+        { id: 'STB-2001', customer: 'Rajesh Verma', lane: 'Lane 3', status: 'active', payment: 'paid' },
+        { id: 'STB-2002', customer: 'Sunita Devi', lane: 'Lane 3', status: 'active', payment: 'unpaid' },
+        { id: 'STB-2003', customer: 'Vijay Patel', lane: 'Lane 4', status: 'active', payment: 'paid' },
+        { id: 'STB-2004', customer: 'Anita Singh', lane: 'Lane 4', status: 'inactive', payment: 'unpaid' },
+        { id: 'STB-2005', customer: 'Karan Mehta', lane: 'Lane 3', status: 'pending', payment: 'unpaid' }
+      ],
+      LCO003: [
+        { id: 'STB-3001', customer: 'Ravi Kumar', lane: 'Lane 1', status: 'active', payment: 'paid' },
+        { id: 'STB-3002', customer: 'Neha Gupta', lane: 'Lane 1', status: 'active', payment: 'paid' },
+        { id: 'STB-3003', customer: 'Deepak Jha', lane: 'Lane 2', status: 'inactive', payment: 'unpaid' },
+        { id: 'STB-3004', customer: 'Pooja Sharma', lane: 'Lane 2', status: 'active', payment: 'paid' }
+      ]
+    };
+
+    function getLcoId() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('id') || 'LCO001';
+    }
+
+    let currentFilter = 'all';
+    const isLocked = new Date().getDate() >= 21;
+
+    function statusBadge(status) {
+      if (status === 'active') return '<span class="bg-green-50 text-green-600 px-2.5 py-1 rounded-full text-xs font-medium">Active</span>';
+      if (status === 'inactive') return '<span class="bg-red-50 text-red-500 px-2.5 py-1 rounded-full text-xs font-medium">Inactive</span>';
+      return '<span class="bg-yellow-50 text-yellow-600 px-2.5 py-1 rounded-full text-xs font-medium"><i class="fas fa-clock mr-0.5"></i>Pending</span>';
+    }
+
+    function renderBoxes() {
+      const lcoId = getLcoId();
+      const boxes = allBoxesData[lcoId] || [];
+      const pendingCount = boxes.filter(b => b.status === 'pending').length;
+      document.getElementById('boxSubtitle').textContent = lcoId + ' · ' + boxes.length + ' boxes' + (pendingCount ? ' (' + pendingCount + ' pending)' : '');
+
+      if (isLocked) {
+        document.getElementById('lockBanner').classList.remove('hidden');
+      }
+
+      const filtered = currentFilter === 'all' ? boxes : boxes.filter(b => b.status === currentFilter);
+      const list = document.getElementById('boxList');
+      list.innerHTML = filtered.map(b => `
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-semibold text-gray-800">${b.customer}</p>
+              <p class="text-xs text-gray-500">${b.id} · ${b.lane}</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs ${b.payment === 'paid' ? 'text-green-600' : 'text-orange-500'}">
+                <i class="fas fa-${b.payment === 'paid' ? 'check-circle' : 'times-circle'} mr-1"></i>${b.payment === 'paid' ? 'Paid' : 'Unpaid'}
+              </span>
+            </div>
+          </div>
+          <div class="flex items-center justify-between mt-3 pt-3 border-t border-gray-50">
+            <span>${statusBadge(b.status)}</span>
+            ${b.status === 'pending' ? '<span class="text-xs text-yellow-600"><i class="fas fa-hourglass-half mr-1"></i>Awaiting Admin</span>' : `
+            <button onclick="toggleStatus('${b.id}')" class="relative inline-flex items-center h-7 w-12 rounded-full transition-colors ${b.status === 'active' ? 'bg-green-500' : 'bg-gray-300'} ${isLocked ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}" ${isLocked ? 'disabled' : ''}>
+              <span class="inline-block w-5 h-5 transform bg-white rounded-full shadow-sm transition-transform ${b.status === 'active' ? 'translate-x-6' : 'translate-x-1'}"></span>
+            </button>`}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function filterBoxes(filter) {
+      currentFilter = filter;
+      ['All', 'Active', 'Inactive', 'Pending'].forEach(f => {
+        const btn = document.getElementById('bf' + f);
+        const fLower = f.toLowerCase();
+        if (fLower === filter) {
+          btn.className = 'px-4 py-2 bg-blue-600 text-white rounded-full text-xs font-medium whitespace-nowrap';
+        } else {
+          btn.className = 'px-4 py-2 bg-white text-gray-600 rounded-full text-xs font-medium border border-gray-200 whitespace-nowrap';
+        }
+      });
+      renderBoxes();
+    }
+
+    function toggleStatus(boxId) {
+      if (isLocked) {
+        alert('Activation/Deactivation is locked (21st - month end). Contact Admin.');
+        return;
+      }
+      const lcoId = getLcoId();
+      const boxes = allBoxesData[lcoId] || [];
+      const box = boxes.find(b => b.id === boxId);
+      if (!box) return;
+      if (box.status === 'pending') {
+        alert('This connection is pending Admin approval. Cannot change status yet.');
+        return;
+      }
+      box.status = box.status === 'active' ? 'inactive' : 'active';
+      renderBoxes();
+    }
+
+    function openRequestModal() {
+      document.getElementById('requestModal').classList.remove('translate-y-full');
+      document.getElementById('requestOverlay').classList.remove('hidden');
+    }
+
+    function closeRequestModal() {
+      document.getElementById('requestModal').classList.add('translate-y-full');
+      document.getElementById('requestOverlay').classList.add('hidden');
+    }
+
+    function submitRequest() {
+      const name = document.getElementById('reqCustomerName').value.trim();
+      const lane = document.getElementById('reqCustomerLane').value;
+      if (!name) { alert('Please enter customer name'); return; }
+
+      const lcoId = getLcoId();
+      if (!allBoxesData[lcoId]) allBoxesData[lcoId] = [];
+      const existing = allBoxesData[lcoId];
+      const lastNum = existing.reduce((max, b) => {
+        const num = parseInt(b.id.split('-')[1]);
+        return num > max ? num : max;
+      }, parseInt(lcoId.replace('LCO', '')) * 100);
+      const newId = 'STB-' + (lastNum + 1);
+
+      existing.push({ id: newId, customer: name, lane, status: 'pending', payment: 'unpaid' });
+
+      document.getElementById('reqCustomerName').value = '';
+      closeRequestModal();
+      renderBoxes();
+
+      const toast = document.createElement('div');
+      toast.className = 'fixed bottom-24 left-4 right-4 max-w-lg mx-auto bg-yellow-600 text-white text-sm text-center py-3 px-4 rounded-xl shadow-lg z-50 animate-bounce';
+      toast.textContent = 'Request sent for ' + name + ' (' + newId + '). Waiting for Admin approval.';
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3500);
+    }
+
+    renderBoxes();
+  </script>
+</body>
+</html>
