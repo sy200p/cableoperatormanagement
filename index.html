@@ -1,28 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>JK Channel</title>
+  <title>Cable Operator Management</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
+
 <body class="bg-gray-50 min-h-screen flex items-center justify-center font-sans">
   <div class="w-full max-w-sm mx-auto px-5">
     <div class="text-center mb-8">
-      <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+      <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg" style="
+    background-color: red;
+">
         <i class="fas fa-tv text-white text-2xl"></i>
       </div>
-      <h1 class="text-2xl font-bold text-gray-800">Cable Operator</h1>
-      <p class="text-gray-500 text-sm mt-1">Management System</p>
+      <h1 class="text-2xl font-bold text-gray-800">JK CHANNEL</h1>
+      <p class="text-gray-500 text-sm mt-1">Cable Management System</p>
     </div>
 
     <div class="bg-white rounded-2xl p-6 shadow-lg shadow-gray-200">
       <div class="flex bg-gray-100 rounded-xl p-1 mb-6">
-        <button id="tabAdmin" class="flex-1 py-2.5 text-sm font-medium rounded-lg bg-white text-blue-600 shadow-sm transition-all" onclick="switchRole('admin')">
+        <button id="tabAdmin"
+          class="flex-1 py-2.5 text-sm font-medium rounded-lg bg-white text-blue-600 shadow-sm transition-all"
+          onclick="switchRole('admin')">
           <i class="fas fa-user-shield mr-1"></i> Admin
         </button>
-        <button id="tabLco" class="flex-1 py-2.5 text-sm font-medium rounded-lg text-gray-500 transition-all" onclick="switchRole('lco')">
+        <button id="tabLco" class="flex-1 py-2.5 text-sm font-medium rounded-lg text-gray-500 transition-all"
+          onclick="switchRole('lco')">
           <i class="fas fa-user-tie mr-1"></i> LCO
         </button>
       </div>
@@ -34,7 +41,9 @@
           </label>
           <div class="relative">
             <i class="fas fa-id-card absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
-            <input type="text" id="userId" class="w-full pl-9 pr-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="Enter ID">
+            <input type="text" id="userId"
+              class="w-full pl-9 pr-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+              placeholder="Enter ID">
           </div>
         </div>
 
@@ -42,22 +51,27 @@
           <label class="text-sm font-medium text-gray-700 block mb-1.5">Password</label>
           <div class="relative">
             <i class="fas fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
-            <input type="password" id="password" class="w-full pl-9 pr-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="Enter password">
+            <input type="password" id="password"
+              class="w-full pl-9 pr-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+              placeholder="Enter password">
             <button class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" onclick="togglePassword()">
               <i id="eyeIcon" class="fas fa-eye"></i>
             </button>
           </div>
         </div>
 
-        <button onclick="handleLogin()" class="w-full bg-blue-600 text-white py-3.5 rounded-xl font-semibold text-sm hover:bg-blue-700 active:bg-blue-800 transition-all shadow-lg shadow-blue-200">
+        <button onclick="handleLogin()"
+          class="w-full bg-blue-600 text-white py-3.5 rounded-xl font-semibold text-sm hover:bg-blue-700 active:bg-blue-800 transition-all shadow-lg shadow-blue-200">
           Sign In
         </button>
       </div>
 
       <div class="mt-6 p-3 bg-blue-50 rounded-xl border border-blue-100">
         <p class="text-xs text-blue-700 font-medium mb-1">Demo Credentials</p>
-        <p class="text-xs text-blue-600">Admin: <span class="font-mono">ADMIN001</span> / <span class="font-mono">admin123</span></p>
-        <p class="text-xs text-blue-600">LCO: <span class="font-mono">LCO001</span> / <span class="font-mono">lco123</span></p>
+        <p class="text-xs text-blue-600">Admin: <span class="font-mono">ADMIN001</span> / <span
+            class="font-mono">admin123</span></p>
+        <p class="text-xs text-blue-600">LCO: <span class="font-mono">LCO001</span> / <span
+            class="font-mono">lco123</span></p>
       </div>
     </div>
   </div>
@@ -120,4 +134,5 @@
     }
   </script>
 </body>
+
 </html>
